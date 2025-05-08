@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Real-time Music Sync & Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="join-room">
+    <h2>Join a Room</h2>
+    <input type="text" id="room-id" placeholder="Room ID" />
+    <label>
+      <input type="checkbox" id="is-admin" />
+      Join as Admin
+    </label>
+    <button id="join-btn">Join</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <h2>Room: <span id="room-name"></span></h2>
+    <div id="music-player">
+      <audio id="audio" controls></audio>
+      <div id="music-selection" style="display:none;">
+        <label for="file-input">Select a song to play:</label>
+        <input type="file" id="file-input" accept="audio/*" />
+      </div>
+    </div>
+    <div id="chat">
+      <div id="chat-messages"></div>
+      <input type="text" id="chat-input" placeholder="Type a message..." />
+      <button id="send-chat-btn">Send</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
