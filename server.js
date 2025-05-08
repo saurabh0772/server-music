@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
+const multer = require('multer');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,7 +10,32 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, 'public/uploads'));
+  },
+  filename: function (req, file, cb) {
+    // Use original file name or you can customize it
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage });
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Endpoint to handle file uploads
+app.post('/upload', upload.single('musicFile'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  // Return the accessible URL of the uploaded file
+  const fileUrl = `/uploads/${req.file.filename}`;
+  res.json({ fileUrl });
+});
 
 let rooms = {};
 

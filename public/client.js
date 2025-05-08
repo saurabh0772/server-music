@@ -41,15 +41,33 @@ joinBtn.addEventListener('click', () => {
 fileInput.addEventListener('change', () => {
   const file = fileInput.files[0];
   if (file) {
-    if (musicFileUrl) {
-      URL.revokeObjectURL(musicFileUrl);
-    }
-    musicFileUrl = URL.createObjectURL(file);
-    audio.src = musicFileUrl;
-    audio.load();
-    audio.pause();
-    // Notify users about new track
-    socket.emit('playMusic', { currentTime: 0, track: musicFileUrl });
+    // Upload file to server
+    const formData = new FormData();
+    formData.append('musicFile', file);
+
+    fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.fileUrl) {
+          if (musicFileUrl) {
+            URL.revokeObjectURL(musicFileUrl);
+          }
+          musicFileUrl = data.fileUrl;
+          audio.src = musicFileUrl;
+          audio.load();
+          audio.pause();
+          // Notify users about new track
+          socket.emit('playMusic', { currentTime: 0, track: musicFileUrl });
+        } else {
+          alert('Failed to upload file');
+        }
+      })
+      .catch(() => {
+        alert('Failed to upload file');
+      });
   }
 });
 
